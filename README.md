@@ -188,10 +188,6 @@ The dataset contains 10,000 bank customers with the following features:
 | Gender          | Male/Female                     |
 | Exited          | Churned (1) or Not (0) - Target |
 
-## - Contribution
-
-Contributions are welcome! If you'd like to improve this project, feel free to fork the repository and submit a pull request. Please ensure your changes align with the project's objectives.
-
 ## - Author
 
 **Sakshi Sood**
