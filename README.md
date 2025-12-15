@@ -40,10 +40,10 @@ This project predicts whether a bank customer will churn (leave the bank) based 
 
 ```
 Bank-Churn-Prediction/
-├── api/                    # FastAPI backend
-│   ├── main.py            # API endpoints
-│   └── requirements.txt   # API dependencies
-├── dashboard/             # React frontend
+├── api/                    
+│   ├── main.py           
+│   └── requirements.txt   
+├── dashboard/             
 │   ├── public/
 │   └── src/
 │       ├── components/
@@ -58,12 +58,12 @@ Bank-Churn-Prediction/
 ├── models/
 │   └── final_churn_model.pkl
 ├── notebooks/
-│   ├── eda.ipynb          # Exploratory Data Analysis
-│   └── training.ipynb     # Model Training
+│   ├── eda.ipynb          
+│   └── training.ipynb     
 ├── src/
 │   ├── EDA.py
 │   └── model_training.py
-└── requirements.txt       # Python dependencies
+└── requirements.txt      
 ```
 
 ## - Getting Started
