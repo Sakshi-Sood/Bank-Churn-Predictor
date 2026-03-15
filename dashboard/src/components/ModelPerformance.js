@@ -16,17 +16,12 @@ import {
 import AutoGraphIcon from "@mui/icons-material/AutoGraph";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
-    BarChart,
-    Bar,
     XAxis,
     YAxis,
     Tooltip,
     ResponsiveContainer,
-    Legend,
     LineChart,
     Line,
-    ReferenceLine,
-    Cell,
 } from "recharts";
 import axios from "axios";
 
@@ -47,36 +42,6 @@ export default function ModelPerformance() {
             });
     }, []);
 
-    // Custom tooltip for charts
-    const CustomTooltip = ({ active, payload, label }) => {
-        if (active && payload && payload.length) {
-            return (
-                <Box
-                    sx={{
-                        background: "#1e293b",
-                        border: "1px solid #334155",
-                        borderRadius: 1,
-                        p: 1.5,
-                    }}
-                >
-                    <Typography variant="body2" fontWeight="bold" sx={{ mb: 0.5 }}>
-                        {label}
-                    </Typography>
-                    {payload.map((entry, index) => (
-                        <Typography
-                            key={index}
-                            variant="body2"
-                            sx={{ color: entry.color }}
-                        >
-                            {entry.name}: {typeof entry.value === 'number' ? entry.value.toFixed(3) : entry.value}
-                        </Typography>
-                    ))}
-                </Box>
-            );
-        }
-        return null;
-    };
-
     if (loading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
@@ -93,7 +58,11 @@ export default function ModelPerformance() {
         );
     }
 
-    const { model_comparison, confusion_matrix, roc_curve, selection_reason } = data;
+    const { model_comparison, confusion_matrix, roc_curve } = data;
+
+    const selectedModelName = "XGBoost";
+    const selectedModel =
+        model_comparison?.find((row) => row.model === selectedModelName) ?? null;
 
     // Prepare ROC curve data
     const rocData = roc_curve.fpr.map((fpr, index) => ({
@@ -126,19 +95,91 @@ export default function ModelPerformance() {
                         sx={{
                             display: "flex",
                             alignItems: "center",
-                            background: "linear-gradient(90deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))",
+                            background: "rgba(51, 65, 85, 0.45)",
                             borderRadius: 1,
                             p: 2,
                             border: "1px solid #334155",
+                            borderLeft: "4px solid #10b981",
                         }}
                     >
                         <CheckCircleIcon sx={{ color: "#10b981", mr: 1.5, fontSize: 20 }} />
-                        <Typography variant="body2" sx={{ color: "#94a3b8" }}>
-                            {selection_reason}
+                        <Typography variant="body2" sx={{ color: "#cbd5e1", lineHeight: 1.7 }}>
+                            XGBoost was selected as the final model — it delivered the best balance of Accuracy (87%) and AUC (0.873) across all tested models. Recall remains an area for improvement, reflecting the inherent challenge of identifying churners in imbalanced datasets.
                         </Typography>
                     </Box>
                 </CardContent>
             </Card>
+
+            {/* XGBoost Summary */}
+            <Box sx={{ mb: 3 }}>
+                <Typography variant="caption" sx={{ color: "#94a3b8", fontWeight: 700, letterSpacing: 0.4, mb: 1, display: "block" }}>
+                    XGBoost — Selected Model
+                </Typography>
+                <Box sx={{ display: "flex", gap: 2, flexWrap: { xs: "wrap", md: "nowrap" } }}>
+                    <Card
+                        sx={{
+                            flex: 1,
+                            minWidth: { xs: "100%", md: 0 },
+                            background: "#1e293b",
+                            borderRadius: 2,
+                            border: "1px solid #334155",
+                            overflow: "hidden",
+                        }}
+                    >
+                        <Box sx={{ height: 4, background: "#6366f1" }} />
+                        <CardContent sx={{ p: 2.5 }}>
+                            <Typography variant="body2" sx={{ color: "#94a3b8" }}>
+                                Accuracy
+                            </Typography>
+                            <Typography variant="h4" fontWeight={800} sx={{ mt: 0.5, color: "#6366f1" }}>
+                                {selectedModel ? `${(selectedModel.accuracy * 100).toFixed(0)}%` : "87%"}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+
+                    <Card
+                        sx={{
+                            flex: 1,
+                            minWidth: { xs: "100%", md: 0 },
+                            background: "#1e293b",
+                            borderRadius: 2,
+                            border: "1px solid #334155",
+                            overflow: "hidden",
+                        }}
+                    >
+                        <Box sx={{ height: 4, background: "#f59e0b" }} />
+                        <CardContent sx={{ p: 2.5 }}>
+                            <Typography variant="body2" sx={{ color: "#94a3b8" }}>
+                                Recall
+                            </Typography>
+                            <Typography variant="h4" fontWeight={800} sx={{ mt: 0.5, color: "#f59e0b" }}>
+                                {selectedModel ? `${(selectedModel.recall * 100).toFixed(1)}%` : "51.3%"}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+
+                    <Card
+                        sx={{
+                            flex: 1,
+                            minWidth: { xs: "100%", md: 0 },
+                            background: "#1e293b",
+                            borderRadius: 2,
+                            border: "1px solid #334155",
+                            overflow: "hidden",
+                        }}
+                    >
+                        <Box sx={{ height: 4, background: "#10b981" }} />
+                        <CardContent sx={{ p: 2.5 }}>
+                            <Typography variant="body2" sx={{ color: "#94a3b8" }}>
+                                AUC
+                            </Typography>
+                            <Typography variant="h4" fontWeight={800} sx={{ mt: 0.5, color: "#10b981" }}>
+                                {selectedModel ? selectedModel.auc.toFixed(3) : "0.873"}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Box>
+            </Box>
 
             {/* Model Comparison Section */}
             <Card sx={{ background: "#1e293b", borderRadius: 2, mb: 3 }}>
@@ -147,44 +188,17 @@ export default function ModelPerformance() {
                         Model Comparison
                     </Typography>
 
-                    {/* Comparison Bar Chart */}
-                    <Box sx={{ height: 300, mb: 4 }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart
-                                data={model_comparison}
-                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                            >
-                                <XAxis
-                                    dataKey="model"
-                                    tick={{ fill: "#94a3b8", fontSize: 12 }}
-                                    axisLine={{ stroke: "#334155" }}
-                                    tickLine={{ stroke: "#334155" }}
-                                />
-                                <YAxis
-                                    domain={[0, 1]}
-                                    tick={{ fill: "#94a3b8", fontSize: 12 }}
-                                    axisLine={{ stroke: "#334155" }}
-                                    tickLine={{ stroke: "#334155" }}
-                                />
-                                <Tooltip
-                                    content={<CustomTooltip />}
-                                    cursor={{ fill: "rgba(99, 102, 241, 0.1)" }}
-                                />
-                                <Legend
-                                    wrapperStyle={{ paddingTop: 20 }}
-                                />
-                                <Bar dataKey="accuracy" name="Accuracy" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                                <Bar dataKey="recall" name="Recall" fill="#10b981" radius={[4, 4, 0, 0]} />
-                                <Bar dataKey="auc" name="AUC" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </Box>
-
                     {/* Comparison Table */}
-                    <TableContainer>
+                    <TableContainer
+                        sx={{
+                            border: "1px solid #334155",
+                            borderRadius: 2,
+                            overflow: "hidden",
+                        }}
+                    >
                         <Table size="small">
                             <TableHead>
-                                <TableRow>
+                                <TableRow sx={{ background: "rgba(15, 23, 42, 0.6)" }}>
                                     <TableCell sx={{ color: "#94a3b8", borderColor: "#334155", fontWeight: "bold" }}>
                                         Model
                                     </TableCell>
@@ -201,26 +215,54 @@ export default function ModelPerformance() {
                             </TableHead>
                             <TableBody>
                                 {model_comparison.map((row) => (
-                                    <TableRow
-                                        key={row.model}
-                                        sx={{
-                                            background: row.model === "XGBoost" ? "rgba(99, 102, 241, 0.1)" : "transparent",
-                                            "&:hover": { background: "rgba(99, 102, 241, 0.05)" },
-                                        }}
-                                    >
-                                        <TableCell sx={{ color: "white", borderColor: "#334155", fontWeight: row.model === "XGBoost" ? "bold" : "normal" }}>
-                                            {row.model}
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: "white", borderColor: "#334155" }}>
-                                            {(row.accuracy * 100).toFixed(1)}%
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: "#10b981", borderColor: "#334155", fontWeight: "bold" }}>
-                                            {(row.recall * 100).toFixed(1)}%
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ color: "#f59e0b", borderColor: "#334155", fontWeight: "bold" }}>
-                                            {row.auc.toFixed(3)}
-                                        </TableCell>
-                                    </TableRow>
+                                    (() => {
+                                        const isSelected = row.model === selectedModelName;
+                                        return (
+                                            <TableRow
+                                                key={row.model}
+                                                sx={{
+                                                    background: isSelected ? "rgba(99, 102, 241, 0.08)" : "transparent",
+                                                    "&:hover": { background: "rgba(99, 102, 241, 0.05)" },
+                                                }}
+                                            >
+                                                <TableCell
+                                                    sx={{
+                                                        color: "white",
+                                                        borderColor: "#334155",
+                                                        fontWeight: isSelected ? "bold" : "normal",
+                                                        borderLeft: isSelected ? "4px solid #6366f1" : "4px solid transparent",
+                                                        pl: isSelected ? 1.5 : 2,
+                                                        whiteSpace: "nowrap",
+                                                    }}
+                                                >
+                                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                                        <span>{row.model}</span>
+                                                        {isSelected && (
+                                                            <Chip
+                                                                label="Selected"
+                                                                size="small"
+                                                                sx={{
+                                                                    height: 20,
+                                                                    background: "rgba(99, 102, 241, 0.2)",
+                                                                    color: "#a5b4fc",
+                                                                    fontWeight: "bold",
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </Box>
+                                                </TableCell>
+                                                <TableCell align="center" sx={{ color: "white", borderColor: "#334155" }}>
+                                                    {(row.accuracy * 100).toFixed(1)}%
+                                                </TableCell>
+                                                <TableCell align="center" sx={{ color: "#10b981", borderColor: "#334155", fontWeight: "bold" }}>
+                                                    {(row.recall * 100).toFixed(1)}%
+                                                </TableCell>
+                                                <TableCell align="center" sx={{ color: "#f59e0b", borderColor: "#334155", fontWeight: "bold" }}>
+                                                    {row.auc.toFixed(3)}
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })()
                                 ))}
                             </TableBody>
                         </Table>
@@ -233,16 +275,23 @@ export default function ModelPerformance() {
                 Final Model Evaluation (XGBoost)
             </Typography>
 
-            <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
+            <Box
+                sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+                    gap: 3,
+                    alignItems: "stretch",
+                }}
+            >
                 {/* Confusion Matrix */}
-                <Card sx={{ background: "#1e293b", borderRadius: 2, flex: "1 1 400px" }}>
-                    <CardContent sx={{ p: 3 }}>
+                <Card sx={{ background: "#1e293b", borderRadius: 2, border: "1px solid #334155", height: "100%", display: "flex", flexDirection: "column" }}>
+                    <CardContent sx={{ p: 4, flex: 1 }}>
                         <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 3 }}>
                             Confusion Matrix
                         </Typography>
 
                         <Box sx={{ display: "flex", justifyContent: "center" }}>
-                            <Box>
+                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                                 {/* Labels */}
                                 <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
                                     <Typography variant="caption" sx={{ color: "#94a3b8", ml: 8 }}>
@@ -371,8 +420,8 @@ export default function ModelPerformance() {
                                     sx={{
                                         mt: 2,
                                         p: 1.5,
-                                        background: "rgba(239, 68, 68, 0.1)",
-                                        border: "1px solid rgba(239, 68, 68, 0.3)",
+                                        background: "rgba(239, 68, 68, 0.08)",
+                                        border: "1px solid rgba(239, 68, 68, 0.25)",
                                         borderRadius: 1,
                                     }}
                                 >
@@ -386,8 +435,8 @@ export default function ModelPerformance() {
                 </Card>
 
                 {/* ROC Curve */}
-                <Card sx={{ background: "#1e293b", borderRadius: 2, flex: "1 1 400px" }}>
-                    <CardContent sx={{ p: 3 }}>
+                <Card sx={{ background: "#1e293b", borderRadius: 2, border: "1px solid #334155", height: "100%", display: "flex", flexDirection: "column" }}>
+                    <CardContent sx={{ p: 4, flex: 1, display: "flex", flexDirection: "column" }}>
                         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
                             <Typography variant="subtitle1" fontWeight="bold">
                                 ROC Curve
@@ -437,7 +486,16 @@ export default function ModelPerformance() {
                                         }}
                                     />
                                     <Tooltip
-                                        content={<CustomTooltip />}
+                                        contentStyle={{
+                                            backgroundColor: "#1e293b",
+                                            border: "1px solid #334155",
+                                            borderRadius: 8,
+                                        }}
+                                        labelStyle={{ color: "#e2e8f0", fontWeight: 700 }}
+                                        itemStyle={{ color: "#94a3b8" }}
+                                        formatter={(value) =>
+                                            typeof value === "number" ? value.toFixed(3) : value
+                                        }
                                         cursor={{ stroke: "#6366f1", strokeDasharray: "5 5" }}
                                     />
                                     {/* Diagonal reference line */}
@@ -475,7 +533,7 @@ export default function ModelPerformance() {
                             }}
                         >
                             <Typography variant="caption" sx={{ color: "#a5b4fc" }}>
-                                📈 AUC of <strong>0.873</strong> indicates excellent class separation. The model correctly ranks churners higher than non-churners 87.3% of the time.
+                                AUC of <strong>0.873</strong> indicates strong class separation — XGBoost reliably distinguishes churners from non-churners across all classification thresholds.
                             </Typography>
                         </Box>
                     </CardContent>
