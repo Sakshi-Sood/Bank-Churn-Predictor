@@ -47,7 +47,7 @@ export default function PredictionCard() {
 
         try {
             const response = await axios.post(
-                "http://127.0.0.1:8000/predict",
+                "https://bank-churn-predictor-q01c.onrender.com/predict",
                 {
                     ...formData,
                     Age: Number(formData.Age),

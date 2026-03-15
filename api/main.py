@@ -224,5 +224,5 @@ def model_performance():
         "confusion_matrix": confusion_matrix,
         "roc_curve": roc_curve,
         "selected_model": "XGBoost",
-        "selection_reason": "We prioritized Recall and AUC because missing churners is more costly than false alarms. XGBoost performed best and was therefore deployed."
+        "selection_reason": "We prioritized Recall and AUC because missing likely churners is typically more costly than a few false alarms. XGBoost offered the best overall balance, so it’s the model we deployed."
     }

@@ -36,7 +36,7 @@ export default function ModelPerformance() {
 
     useEffect(() => {
         axios
-            .get("http://127.0.0.1:8000/model-performance")
+            .get("https://bank-churn-predictor-q01c.onrender.com/model-performance")
             .then((res) => {
                 setData(res.data);
                 setLoading(false);
@@ -197,9 +197,6 @@ export default function ModelPerformance() {
                                     <TableCell align="center" sx={{ color: "#94a3b8", borderColor: "#334155", fontWeight: "bold" }}>
                                         AUC
                                     </TableCell>
-                                    <TableCell align="center" sx={{ color: "#94a3b8", borderColor: "#334155", fontWeight: "bold" }}>
-                                        Status
-                                    </TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -222,23 +219,6 @@ export default function ModelPerformance() {
                                         </TableCell>
                                         <TableCell align="center" sx={{ color: "#f59e0b", borderColor: "#334155", fontWeight: "bold" }}>
                                             {row.auc.toFixed(3)}
-                                        </TableCell>
-                                        <TableCell align="center" sx={{ borderColor: "#334155" }}>
-                                            {row.model === "XGBoost" ? (
-                                                <Chip
-                                                    label="Deployed"
-                                                    size="small"
-                                                    sx={{
-                                                        background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
-                                                        color: "white",
-                                                        fontWeight: "bold",
-                                                    }}
-                                                />
-                                            ) : (
-                                                <Typography variant="body2" sx={{ color: "#64748b" }}>
-                                                    —
-                                                </Typography>
-                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))}

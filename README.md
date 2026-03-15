@@ -1,4 +1,4 @@
-# Bank Customer Churn Prediction
+# Bank Customer Churn Predictor
 
 A full-stack machine learning application that predicts customer churn for banks using XGBoost, with an interactive React dashboard and FastAPI backend.
 

@@ -29,10 +29,10 @@ export default function Navbar({ tab, setTab }) {
                 </Box>
                 <Box>
                     <Typography variant="h4" fontWeight="bold">
-                        Bank Churn Prediction
+                        Bank Churn Predictor
                     </Typography>
                     <Typography variant="body2" color="gray">
-                        AI-Powered Customer Retention Platform
+                        Predict and analyze customer churn
                     </Typography>
                 </Box>
             </Box>
