@@ -1,13 +1,31 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List
+from pathlib import Path
+import json
 import joblib
 import pandas as pd
 import shap
 import numpy as np
 
 app = FastAPI()
+
+
+@app.get("/")
+def root():
+    return {
+        "message": "Bank Churn Predictor API is running",
+        "docs": "/docs",
+        "redoc": "/redoc",
+        "health": "/health"
+    }
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 # -----------------------------
 # Enable CORS
@@ -73,10 +91,10 @@ def predict(data: Customer):
     # -----------------------------
 
     # Apply SAME preprocessing as training
-    X_transformed = preprocessor.transform(df)
+    transformed_input = preprocessor.transform(df)
 
     # SHAP values for class 1 (churn)
-    shap_values = explainer.shap_values(X_transformed)
+    shap_values = explainer.shap_values(transformed_input)
 
     # Get feature names after preprocessing
     ohe = preprocessor.named_transformers_["cat"]
@@ -169,60 +187,23 @@ def analytics():
 # -----------------------------
 # Model Performance endpoint
 # -----------------------------
-@app.get("/model-performance")
-def model_performance():
-    """
-    Returns pre-computed model comparison metrics and XGBoost evaluation data.
-    These metrics were saved during training - NOT computed at runtime.
-    """
-    
-    # Model comparison metrics (from training notebook)
-    model_comparison = [
-        {
-            "model": "Logistic Regression",
-            "accuracy": 0.811,
-            "recall": 0.197,
-            "auc": 0.760
-        },
-        {
-            "model": "Random Forest",
-            "accuracy": 0.866,
-            "recall": 0.467,
-            "auc": 0.859
-        },
-        {
-            "model": "XGBoost",
-            "accuracy": 0.870,
-            "recall": 0.513,
-            "auc": 0.873
-        },
-        {
-            "model": "SVM",
-            "accuracy": 0.858,
-            "recall": 0.413,
-            "auc": 0.843
+@app.get(
+    "/model-performance",
+    responses={
+        500: {
+            "description": "Model performance JSON is missing or invalid"
         }
-    ]
+    },
+)
+def model_performance():
     
-    # XGBoost Confusion Matrix [TN, FP, FN, TP]
-    confusion_matrix = {
-        "true_negative": 1529,
-        "false_positive": 78,
-        "false_negative": 182,
-        "true_positive": 211
-    }
-    
-    # ROC Curve data points for XGBoost
-    roc_curve = {
-        "fpr": [0.0, 0.01, 0.02, 0.05, 0.10, 0.15, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.0],
-        "tpr": [0.0, 0.15, 0.28, 0.45, 0.58, 0.67, 0.74, 0.82, 0.87, 0.91, 0.94, 0.96, 0.98, 0.99, 1.0],
-        "auc": 0.873
-    }
-    
-    return {
-        "model_comparison": model_comparison,
-        "confusion_matrix": confusion_matrix,
-        "roc_curve": roc_curve,
-        "selected_model": "XGBoost",
-        "selection_reason": "We prioritized Recall and AUC because missing likely churners is typically more costly than a few false alarms. XGBoost offered the best overall balance, so it’s the model we deployed."
-    }
+
+    metrics_file = Path(__file__).resolve().parent.parent / "data" / "model_performance.json"
+
+    try:
+        with metrics_file.open("r", encoding="utf-8") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return JSONResponse(status_code=500, content={"detail": "model_performance.json not found"})
+    except json.JSONDecodeError:
+        return JSONResponse(status_code=500, content={"detail": "model_performance.json is invalid"})

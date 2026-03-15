@@ -1,0 +1,47 @@
+{
+  "model_comparison": [
+    {
+      "model": "Logistic Regression",
+      "accuracy": 0.811,
+      "recall": 0.197,
+      "auc": 0.76
+    },
+    {
+      "model": "Random Forest",
+      "accuracy": 0.866,
+      "recall": 0.467,
+      "auc": 0.859
+    },
+    {
+      "model": "XGBoost",
+      "accuracy": 0.87,
+      "recall": 0.513,
+      "auc": 0.873
+    },
+    {
+      "model": "SVM",
+      "accuracy": 0.858,
+      "recall": 0.413,
+      "auc": 0.843
+    }
+  ],
+  "confusion_matrix": {
+    "true_negative": 1529,
+    "false_positive": 78,
+    "false_negative": 182,
+    "true_positive": 211
+  },
+  "roc_curve": {
+    "fpr": [
+      0.0, 0.01, 0.02, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
+      1.0
+    ],
+    "tpr": [
+      0.0, 0.15, 0.28, 0.45, 0.58, 0.67, 0.74, 0.82, 0.87, 0.91, 0.94, 0.96,
+      0.98, 0.99, 1.0
+    ],
+    "auc": 0.873
+  },
+  "selected_model": "XGBoost",
+  "selection_reason": "We prioritized Recall and AUC because missing likely churners is typically more costly than a few false alarms. XGBoost offered the best overall balance, so it’s the model we deployed."
+}
