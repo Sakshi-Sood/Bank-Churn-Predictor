@@ -16,6 +16,12 @@ This project predicts whether a bank customer will churn (leave the bank) based 
 - **Interactive Dashboard**: React-based UI with Material-UI components
 - **REST API**: FastAPI backend serving predictions and analytics
 
+## - Live Demo
+
+- **Frontend App**: https://bank-churn-dashboard.onrender.com/
+- **Deployed API**: https://bank-churn-predictor-q01c.onrender.com
+- **API Docs (Swagger)**: https://bank-churn-predictor-q01c.onrender.com/docs
+
 ## - Features
 
 ### Prediction Tab
@@ -32,7 +38,8 @@ This project predicts whether a bank customer will churn (leave the bank) based 
 
 ### Model Performance Tab
 
-- Comparison of 4 ML models (Logistic Regression, Random Forest, XGBoost, SVM)
+- XGBoost summary metric cards (Accuracy, Recall, AUC)
+- Styled comparison table of 4 ML models (Logistic Regression, Random Forest, XGBoost, SVM) with selected-model highlighting
 - Confusion matrix visualization
 - ROC curve with AUC score
 
@@ -40,10 +47,10 @@ This project predicts whether a bank customer will churn (leave the bank) based 
 
 ```
 Bank-Churn-Prediction/
-├── api/                    
-│   ├── main.py           
-│   └── requirements.txt   
-├── dashboard/             
+├── api/
+│   ├── main.py
+│   └── requirements.txt
+├── dashboard/
 │   ├── public/
 │   └── src/
 │       ├── components/
@@ -58,12 +65,12 @@ Bank-Churn-Prediction/
 ├── models/
 │   └── final_churn_model.pkl
 ├── notebooks/
-│   ├── eda.ipynb          
-│   └── training.ipynb     
+│   ├── eda.ipynb
+│   └── training.ipynb
 ├── src/
 │   ├── EDA.py
 │   └── model_training.py
-└── requirements.txt      
+└── requirements.txt
 ```
 
 ## - Getting Started
@@ -122,9 +129,9 @@ Bank-Churn-Prediction/
 | Logistic Regression    | 81.1%     | 19.7%     | 0.760     |
 | Random Forest          | 86.6%     | 46.7%     | 0.859     |
 | **XGBoost** (Deployed) | **87.0%** | **51.3%** | **0.873** |
-| SVM                    | 85.8%     | 42.3%     | 0.840     |
+| SVM                    | 85.8%     | 42.3%     | 0.843     |
 
-**Why XGBoost?** Selected for deployment due to highest recall (51.3%) - crucial for identifying at-risk customers before they churn.
+**Why XGBoost?** Selected for deployment because it provides the best overall balance of Accuracy (87.0%) and AUC (0.873), while maintaining stronger Recall (51.3%) than other candidates.
 
 ## - API Endpoints
 
