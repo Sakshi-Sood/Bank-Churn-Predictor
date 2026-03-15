@@ -23,7 +23,7 @@ export default function Analytics() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/analytics")
+        axios.get("https://bank-churn-predictor-q01c.onrender.com/analytics")
             .then(res => {
                 setData(res.data);
                 setLoading(false);

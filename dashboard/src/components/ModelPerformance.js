@@ -36,7 +36,7 @@ export default function ModelPerformance() {
 
     useEffect(() => {
         axios
-            .get("http://127.0.0.1:8000/model-performance")
+            .get("https://bank-churn-predictor-q01c.onrender.com/model-performance")
             .then((res) => {
                 setData(res.data);
                 setLoading(false);
